@@ -3,19 +3,42 @@ const readline = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout
 })
-let db;
+//so I think this is for mongo?
+// let db;
+let db = require('../database/mongo/index.js');
+// let db = require('../database/mysql/index.js');
 
 const path = require('path');
 
 const PORT = 3000;
 const app = express();
+app.use(express.json())
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-app.get('/', (req, res) => {
-  res.send('Hello from the server!');
+// dummy server testing:
+// app.get('/api/cows', (req, res) => {
+//   res.send('Hello from the server!');
+// })
+
+app.get('/api/cows', (req, res) => {
+  // db.query(function(err, result){
+  // })
+  db.getAll()
+  .then(result => res.send(result))
+  .catch(err => res.send(err))
+  // res.send('hi')
 })
 
+app.post('/api/cows', (req, res) => {
+  console.log('req.body:',req.body)
+  db.save(req.body)
+  .then(result => res.send(result)) //this seems to be single entry result
+  .catch(err => res.send(err))
+})
+
+
+//set up listening and db selection
 app.listen(PORT, () => {
   console.log(`Server listening at localhost:${3000}!`);
     readline.question(`Choose your db: (mongo or mysql)\n>>>>>`, choice=>{
@@ -31,3 +54,4 @@ app.listen(PORT, () => {
     })
 
 });
+
